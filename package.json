@@ -35,5 +35,13 @@
     "typescript":                        "^5.5.0",
     "vitest":                            "^2.0.0"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-darwin-arm64":     "4.60.4",
+    "@rollup/rollup-darwin-x64":       "4.60.4",
+    "@rollup/rollup-linux-x64-gnu":    "4.60.4",
+    "@rollup/rollup-linux-x64-musl":   "4.60.4",
+    "@rollup/rollup-linux-arm64-gnu":  "4.60.4",
+    "@rollup/rollup-win32-x64-msvc":   "4.60.4"
+  },
   "engines": { "node": ">=22" }
 }
