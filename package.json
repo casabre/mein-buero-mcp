@@ -1,0 +1,39 @@
+{
+  "name": "mein-buero-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev":           "npx fastmcp dev src/index.ts",
+    "build":         "tsc",
+    "bundle":        "esbuild src/index.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/bundle.cjs",
+    "type-check":    "tsc --noEmit",
+    "lint":          "eslint src",
+    "test":          "vitest run",
+    "test:watch":    "vitest",
+    "test:coverage": "vitest run --coverage",
+    "start:stdio":   "node dist/index.js",
+    "start:http":    "TRANSPORT=http node dist/index.js",
+    "start:sse":     "TRANSPORT=sse node dist/index.js",
+    "inspect":       "npx @modelcontextprotocol/inspector node dist/index.js",
+    "docker:build":  "docker build -t mein-buero-mcp:dev .",
+    "docker:run":    "docker run -e MEINBUERO_OWNERSHIP_ID=xxx -p 3000:3000 mein-buero-mcp:dev"
+  },
+  "dependencies": {
+    "axios":   "^1.7.9",
+    "fastmcp": "^4.0.1",
+    "zod":     "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node":                       "^22.0.0",
+    "@typescript-eslint/eslint-plugin":  "^8.0.0",
+    "@typescript-eslint/parser":         "^8.0.0",
+    "@vitest/coverage-v8":               "^2.0.0",
+    "esbuild":                           "^0.24.0",
+    "eslint":                            "^9.0.0",
+    "postject":                          "^1.0.0-alpha.6",
+    "tsx":                               "^4.7.0",
+    "typescript":                        "^5.5.0",
+    "vitest":                            "^2.0.0"
+  },
+  "engines": { "node": ">=22" }
+}

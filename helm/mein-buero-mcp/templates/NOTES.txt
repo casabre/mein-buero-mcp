@@ -1,0 +1,15 @@
+MeinBüro MCP Server installed!
+
+MCP endpoint (Streamable HTTP):
+  kubectl port-forward svc/{{ include "mein-buero-mcp.fullname" . }} 3000:80
+  curl http://localhost:3000/health
+  curl -X POST http://localhost:3000/mcp -H "Content-Type: application/json" \
+    -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
+
+{{- if .Values.ingress.enabled }}
+External URL:
+  https://{{ (index .Values.ingress.hosts 0).host }}/mcp
+{{- end }}
+
+Test with mcp-inspector:
+  npx @modelcontextprotocol/inspector --transport http --url http://localhost:3000/mcp

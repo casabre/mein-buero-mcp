@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mein-buero-mcp.fullname" . }}
+  labels: {{- include "mein-buero-mcp.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: http
+    name: http
+  selector: {{- include "mein-buero-mcp.selectorLabels" . | nindent 4 }}
