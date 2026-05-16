@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-      - run: npm ci && npm run lint && npm run type-check && npm test
+      - run: npm install && npm run lint && npm run type-check && npm test
 
   build-binaries:
     needs: ci-gate
@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-      - run: npm ci
+      - run: npm install
       - shell: bash
         run: bash .github/scripts/build-binary.sh ${{ github.ref_name }}-${{ matrix.binary }}
       - uses: actions/upload-artifact@v4
