@@ -26,8 +26,6 @@ jobs:
         include:
           - os: ubuntu-latest
             binary: mein-buero-mcp-linux-x64
-          - os: macos-13
-            binary: mein-buero-mcp-macos-x64
           - os: macos-latest
             binary: mein-buero-mcp-macos-arm64
           - os: windows-latest
