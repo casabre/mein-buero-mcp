@@ -7,7 +7,11 @@ OUTPUT="dist/${BINARY_NAME}"
 # 1. Bundle to CJS (SEA requires CommonJS, not ESM)
 npx esbuild src/index.ts \
   --bundle --platform=node --target=node22 \
-  --format=cjs --outfile=dist/bundle.cjs
+  --format=cjs \
+  --external:effect \
+  --external:sury \
+  --external:@valibot/to-json-schema \
+  --outfile=dist/bundle.cjs
 
 # 2. Generate SEA blob
 node --experimental-sea-config sea-config.json

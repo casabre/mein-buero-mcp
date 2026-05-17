@@ -9,8 +9,7 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 
-RUN apk add --no-cache curl \
-  && addgroup -g 1000 nodejs \
+RUN addgroup -g 1000 nodejs \
   && adduser -u 1000 -G nodejs -s /bin/sh -D nodejs
 
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
@@ -21,7 +20,7 @@ USER nodejs
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -sf http://localhost:3000/health || exit 1
+  CMD wget -qO- http://localhost:3000/health || exit 1
 
 ENV NODE_ENV=production \
     TRANSPORT=http \
