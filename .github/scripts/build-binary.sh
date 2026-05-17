@@ -5,6 +5,9 @@ BINARY_NAME=${1:-"mein-buero-mcp"}
 OUTPUT="dist/${BINARY_NAME}"
 
 # 1. Bundle to CJS (SEA requires CommonJS, not ESM)
+# effect/sury/@valibot/to-json-schema are optional dynamic imports in
+# xsschema (fastmcp dep) that are never used at runtime — mark external
+# so esbuild doesn't error trying to resolve them statically.
 npx esbuild src/index.ts \
   --bundle --platform=node --target=node22 \
   --format=cjs \

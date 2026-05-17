@@ -73,7 +73,10 @@ export function registerCustomerTools(server: FastMCP): void {
       lastName:    z.string().optional().describe("Last name"),
       email:       z.string().email().optional().describe("Email address"),
       phone:       z.string().optional().describe("Phone number"),
-    }),
+    }).refine(
+      ({ id: _id, ...fields }) => Object.values(fields).some((v) => v !== undefined),
+      { message: "At least one field to update must be provided" },
+    ),
     execute: async ({ id, ...dto }, ctx) => {
       ctx.log.info("update_customer", { id });
       try {

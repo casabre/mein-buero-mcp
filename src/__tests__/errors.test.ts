@@ -21,6 +21,19 @@ describe("formatApiError", () => {
     expect(formatApiError(err)).toBe("MeinBüro API error 401: Unauthorized");
   });
 
+  it("includes detail when present", () => {
+    const err = new MeinBueroApiError("Validation failed", 422, { field: "email", code: "invalid" });
+    const result = formatApiError(err);
+    expect(result).toContain("MeinBüro API error 422: Validation failed");
+    expect(result).toContain('"field":"email"');
+  });
+
+  it("omits detail separator when detail is absent", () => {
+    const err = new MeinBueroApiError("Not found", 404);
+    expect(formatApiError(err)).toBe("MeinBüro API error 404: Not found");
+    expect(formatApiError(err)).not.toContain("—");
+  });
+
   it("returns message for generic Error", () => {
     expect(formatApiError(new Error("something went wrong"))).toBe("something went wrong");
   });

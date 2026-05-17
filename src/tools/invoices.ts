@@ -3,6 +3,9 @@ import { UserError, type FastMCP } from "fastmcp";
 import { getClient } from "../lib/meinbuero-client.js";
 import { formatApiError } from "../lib/errors.js";
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be ISO 8601 (YYYY-MM-DD)");
+const PDF_SIZE_LIMIT = 5 * 1024 * 1024;
+
 export function registerInvoiceTools(server: FastMCP): void {
   server.addTool({
     name: "get_invoices",
@@ -54,8 +57,12 @@ export function registerInvoiceTools(server: FastMCP): void {
       ctx.log.info("get_invoice_pdf", { id: args.id });
       try {
         const buffer = await getClient().getInvoiceDocument(args.id);
-        return JSON.stringify({ base64: buffer.toString("base64"), mimeType: "application/pdf" });
+        if (buffer.length > PDF_SIZE_LIMIT) {
+          throw new UserError(`PDF is too large (${(buffer.length / 1024 / 1024).toFixed(1)} MB); limit is 5 MB`);
+        }
+        return JSON.stringify({ base64: buffer.toString("base64"), mimeType: "application/pdf", sizeBytes: buffer.length });
       } catch (err) {
+        if (err instanceof UserError) throw err;
         throw new UserError(formatApiError(err));
       }
     },
@@ -66,8 +73,8 @@ export function registerInvoiceTools(server: FastMCP): void {
     description: "Create a new invoice draft.",
     parameters: z.object({
       customerId: z.string().describe("Customer ID"),
-      date:       z.string().describe("Invoice date (ISO 8601, e.g. 2025-05-16)"),
-      dueDate:    z.string().describe("Payment due date (ISO 8601)"),
+      date:       isoDate.describe("Invoice date (ISO 8601, e.g. 2025-05-16)"),
+      dueDate:    isoDate.describe("Payment due date (ISO 8601)"),
       positions:  z.array(z.object({
         articleId:   z.string().optional().describe("Article ID (optional)"),
         description: z.string().describe("Line item description"),
@@ -135,7 +142,7 @@ export function registerInvoiceTools(server: FastMCP): void {
     parameters: z.object({
       id:     z.string().describe("Invoice ID"),
       amount: z.number().positive().describe("Payment amount in EUR"),
-      date:   z.string().describe("Payment date (ISO 8601, e.g. 2025-03-15)"),
+      date:   isoDate.describe("Payment date (ISO 8601, e.g. 2025-03-15)"),
       method: z.string().optional().describe("Payment method (e.g. bank_transfer, cash)"),
     }),
     execute: async ({ id, ...dto }, ctx) => {

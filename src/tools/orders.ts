@@ -3,6 +3,8 @@ import { UserError, type FastMCP } from "fastmcp";
 import { getClient } from "../lib/meinbuero-client.js";
 import { formatApiError } from "../lib/errors.js";
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be ISO 8601 (YYYY-MM-DD)");
+
 export function registerOrderTools(server: FastMCP): void {
   server.addTool({
     name: "get_orders",
@@ -48,7 +50,7 @@ export function registerOrderTools(server: FastMCP): void {
     parameters: z.object({
       customerId:  z.string().optional().describe("Customer ID"),
       orderNumber: z.string().optional().describe("Order number (auto-generated if omitted)"),
-      date:        z.string().optional().describe("Order date (ISO 8601)"),
+      date:        isoDate.optional().describe("Order date (ISO 8601)"),
       status:      z.string().optional().describe("Order status"),
     }),
     execute: async (args, ctx) => {
@@ -64,7 +66,8 @@ export function registerOrderTools(server: FastMCP): void {
 
   server.addTool({
     name: "create_invoice_from_order",
-    description: "Create an invoice from an existing order.",
+    description: "Create an invoice from an existing order. Creates a new document — cannot be undone.",
+    annotations: { destructiveHint: true },
     parameters: z.object({
       orderId: z.string().describe("Order ID to create the invoice from"),
     }),
@@ -81,7 +84,8 @@ export function registerOrderTools(server: FastMCP): void {
 
   server.addTool({
     name: "create_delivery_note_from_order",
-    description: "Create a delivery note (Lieferschein) from an existing order.",
+    description: "Create a delivery note (Lieferschein) from an existing order. Creates a new document — cannot be undone.",
+    annotations: { destructiveHint: true },
     parameters: z.object({
       orderId: z.string().describe("Order ID to create the delivery note from"),
     }),

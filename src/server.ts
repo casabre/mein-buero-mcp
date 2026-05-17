@@ -16,9 +16,16 @@ export function createServer(): FastMCP {
   getClient();
 
   const mcpApiKey = process.env["MEINBUERO_MCP_API_KEY"];
+  const transport = process.env["TRANSPORT"] ?? "stdio";
+  if ((transport === "http" || transport === "sse") && !mcpApiKey) {
+    console.warn(
+      "[meinbuero-mcp] WARNING: HTTP transport is active but MEINBUERO_MCP_API_KEY is not set — MCP endpoint is unauthenticated",
+    );
+  }
+
   const server = new FastMCP({
     name: "meinbuero-mcp",
-    version: "1.0.0",
+    version: (process.env["npm_package_version"] ?? "1.0.0") as `${number}.${number}.${number}`,
     instructions:
       "MeinBüro API via MCP. Amounts in EUR, dates ISO 8601. " +
       "Kunden=Customers, Rechnungen=Invoices, Artikel=Articles, " +

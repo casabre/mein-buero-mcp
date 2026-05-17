@@ -73,7 +73,10 @@ export function registerArticleTools(server: FastMCP): void {
       unitPrice:   z.number().nonnegative().optional().describe("Unit price in EUR (net)"),
       vatRate:     z.number().nonnegative().optional().describe("VAT rate as percentage"),
       unit:        z.string().optional().describe("Unit of measure"),
-    }),
+    }).refine(
+      ({ id: _id, ...fields }) => Object.values(fields).some((v) => v !== undefined),
+      { message: "At least one field to update must be provided" },
+    ),
     execute: async ({ id, ...dto }, ctx) => {
       ctx.log.info("update_article", { id });
       try {

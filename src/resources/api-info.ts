@@ -1,5 +1,6 @@
 import type { FastMCP } from "fastmcp";
 import { getClient } from "../lib/meinbuero-client.js";
+import { formatApiError } from "../lib/errors.js";
 
 export function registerResources(server: FastMCP): void {
   server.addResource({
@@ -23,9 +24,13 @@ Key tools: get_customers, create_customer, get_invoices, get_invoice, create_inv
     uri: "meinbuero://account-settings",
     name: "Account Settings",
     mimeType: "application/json",
-    load: async () => ({
-      text: JSON.stringify(await getClient().getAccountSettings(), null, 2),
-    }),
+    load: async () => {
+      try {
+        return { text: JSON.stringify(await getClient().getAccountSettings(), null, 2) };
+      } catch (err) {
+        throw new Error(formatApiError(err));
+      }
+    },
   });
 
   server.addResourceTemplate({
@@ -33,9 +38,13 @@ Key tools: get_customers, create_customer, get_invoices, get_invoice, create_inv
     name: "Invoice by ID",
     mimeType: "application/json",
     arguments: [{ name: "id", description: "Invoice ID", required: true }],
-    load: async ({ id }) => ({
-      text: JSON.stringify(await getClient().getInvoice(id), null, 2),
-    }),
+    load: async ({ id }) => {
+      try {
+        return { text: JSON.stringify(await getClient().getInvoice(id), null, 2) };
+      } catch (err) {
+        throw new Error(formatApiError(err));
+      }
+    },
   });
 
   server.addResourceTemplate({
@@ -43,8 +52,12 @@ Key tools: get_customers, create_customer, get_invoices, get_invoice, create_inv
     name: "Customer by ID",
     mimeType: "application/json",
     arguments: [{ name: "id", description: "Customer ID", required: true }],
-    load: async ({ id }) => ({
-      text: JSON.stringify(await getClient().getCustomer(id), null, 2),
-    }),
+    load: async ({ id }) => {
+      try {
+        return { text: JSON.stringify(await getClient().getCustomer(id), null, 2) };
+      } catch (err) {
+        throw new Error(formatApiError(err));
+      }
+    },
   });
 }

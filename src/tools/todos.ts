@@ -3,6 +3,8 @@ import { UserError, type FastMCP } from "fastmcp";
 import { getClient } from "../lib/meinbuero-client.js";
 import { formatApiError } from "../lib/errors.js";
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be ISO 8601 (YYYY-MM-DD)");
+
 export function registerTodoTools(server: FastMCP): void {
   server.addTool({
     name: "get_todos",
@@ -30,7 +32,7 @@ export function registerTodoTools(server: FastMCP): void {
     parameters: z.object({
       title:   z.string().describe("Todo title"),
       status:  z.string().optional().describe("Initial status"),
-      dueDate: z.string().optional().describe("Due date (ISO 8601)"),
+      dueDate: isoDate.optional().describe("Due date (ISO 8601)"),
     }),
     execute: async (args, ctx) => {
       ctx.log.info("create_todo", { title: args.title });

@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosError } from "axios";
+import axios, { type AxiosInstance, type AxiosError, isAxiosError } from "axios";
 import { MeinBueroApiError } from "./errors.js";
 
 // ── Domain types ──────────────────────────────────────────────────────────────
@@ -76,6 +76,13 @@ export interface Order {
   date?: string;
 }
 
+export interface CreateOrderDto {
+  customerId?: string;
+  orderNumber?: string;
+  date?: string;
+  status?: string;
+}
+
 export interface Expense {
   id: string;
   amount?: number;
@@ -94,6 +101,12 @@ export interface CreateExpenseDto {
 export interface Todo {
   id: string;
   title?: string;
+  status?: string;
+  dueDate?: string;
+}
+
+export interface CreateTodoDto {
+  title: string;
   status?: string;
   dueDate?: string;
 }
@@ -151,7 +164,7 @@ export class MeinBueroClient {
     this.http.interceptors.response.use(
       (r) => r,
       async (err: AxiosError) => {
-        const config = err.config as unknown as Record<string, unknown>;
+        const config = (err.config ?? {}) as Record<string, unknown>;
         if (err.response?.status === 401 && !config["_retry"]) {
           config["_retry"] = true;
           this.bearerToken = null;
@@ -187,11 +200,10 @@ export class MeinBueroClient {
       );
       this.bearerToken = resp.data.token;
     } catch (err) {
-      const e = err as AxiosError;
-      throw new MeinBueroApiError(
-        `Authentication failed: ${e.message}`,
-        e.response?.status ?? 0,
-      );
+      if (isAxiosError(err)) {
+        throw new MeinBueroApiError(`Authentication failed: ${err.message}`, err.response?.status ?? 0);
+      }
+      throw new MeinBueroApiError(`Authentication failed: ${String(err)}`, 0);
     }
   }
 
@@ -262,7 +274,7 @@ export class MeinBueroClient {
   async getOrder(id: string) {
     return (await this.http.get<Order>(`/order/${encodeURIComponent(id)}`)).data;
   }
-  async createOrder(dto: Partial<Order>) {
+  async createOrder(dto: CreateOrderDto) {
     return (await this.http.post<Order>("/order/", dto)).data;
   }
   async createInvoiceFromOrder(orderId: string) {
@@ -293,7 +305,7 @@ export class MeinBueroClient {
   async listTodos(p?: ListParams) {
     return (await this.http.get<PagedResponse<Todo>>("/todo", { params: p })).data;
   }
-  async createTodo(dto: Partial<Todo>) {
+  async createTodo(dto: CreateTodoDto) {
     return (await this.http.post<Todo>("/todo/", dto)).data;
   }
   async setTodoStatus(id: string, status: string) {

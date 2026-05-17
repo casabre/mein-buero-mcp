@@ -10,8 +10,10 @@ export class MeinBueroApiError extends Error {
 }
 
 export function formatApiError(error: unknown): string {
-  if (error instanceof MeinBueroApiError)
-    return `MeinBüro API error ${error.status}: ${error.message}`;
+  if (error instanceof MeinBueroApiError) {
+    const detail = error.detail != null ? ` — ${JSON.stringify(error.detail)}` : "";
+    return `MeinBüro API error ${error.status}: ${error.message}${detail}`;
+  }
   if (error instanceof Error) return error.message;
   return String(error);
 }

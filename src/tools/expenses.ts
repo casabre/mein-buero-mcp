@@ -3,6 +3,8 @@ import { UserError, type FastMCP } from "fastmcp";
 import { getClient } from "../lib/meinbuero-client.js";
 import { formatApiError } from "../lib/errors.js";
 
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be ISO 8601 (YYYY-MM-DD)");
+
 export function registerExpenseTools(server: FastMCP): void {
   server.addTool({
     name: "get_expenses",
@@ -47,7 +49,7 @@ export function registerExpenseTools(server: FastMCP): void {
     description: "Create a new expense entry.",
     parameters: z.object({
       amount:      z.number().positive().describe("Expense amount in EUR"),
-      date:        z.string().describe("Expense date (ISO 8601, e.g. 2025-03-15)"),
+      date:        isoDate.describe("Expense date (ISO 8601, e.g. 2025-03-15)"),
       category:    z.string().optional().describe("Expense category"),
       description: z.string().optional().describe("Expense description"),
     }),
@@ -68,7 +70,7 @@ export function registerExpenseTools(server: FastMCP): void {
     parameters: z.object({
       id:          z.string().describe("Expense ID"),
       amount:      z.number().positive().optional().describe("Expense amount in EUR"),
-      date:        z.string().optional().describe("Expense date (ISO 8601)"),
+      date:        isoDate.optional().describe("Expense date (ISO 8601)"),
       category:    z.string().optional().describe("Expense category"),
       description: z.string().optional().describe("Expense description"),
     }),
