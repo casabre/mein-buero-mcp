@@ -9,14 +9,11 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 
-RUN addgroup -g 1000 nodejs \
-  && adduser -u 1000 -G nodejs -s /bin/sh -D nodejs
-
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-USER nodejs
+USER node
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
